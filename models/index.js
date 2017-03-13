@@ -5,20 +5,20 @@ var Page = db.define('page',
 {
 	title: {
 		type: Sequelize.STRING,
+		allowNull: false,
 		validate: {
-			notNull: true
 		}
 	},
 	urlTitle: {
 		type: Sequelize.STRING,
+		allowNull: false,
 		validate: {
-			notNull: true
 		}
 	},
 	content: {
 		type: Sequelize.TEXT,
+		allowNull: false,
 		validate: {
-			notNull: true
 		}
 	},
 	status: {
@@ -27,7 +27,7 @@ var Page = db.define('page',
 },
 {
 	getterMethods: {
-		fullUrl: function() { return '/wiki/'+this.urlTitle; }
+		route: function() { return '/wiki/' + this.urlTitle; }
 	}
 }
 );
@@ -35,34 +35,37 @@ var Page = db.define('page',
 var User = db.define('user', {
 	name: {
 		type: Sequelize.STRING,
+		allowNull: false,
 		validate: {
-			notNull: true
 		}
 	},
 	email: {
 		type: Sequelize.STRING,
+		allowNull: false,
 		validate: {
 			isEmail: true,
-			notNull: true
 		}
+	},
+},
+{
+	getterMethods: {
+		route: function() { return '/wiki/users/' + this.id; }
 	}
 });
 
 Page.hook('beforeValidate', function(page, options) {
-  page.urlTitle = nameToUrl(page.urlTitle)
+	page.urlTitle = nameToUrl(page.title);
 })
 
-// Page.hook('afterValidate', function(user, options) {
-//   return sequelize.Promise.reject("I'm afraid I can't let you do that!")
-// })
+Page.belongsTo(User, { as: 'author'});
 
 
 function nameToUrl(name){
-  if(name){
-  return name.split(" ").join('_').replace(/\W/g, '');
-  } else {
-    return Math.random().toString(36).substring(2,7);
-  }
+	if(name){
+		return name.split(" ").join('_').replace(/\W/g, '');
+	} else {
+		return Math.random().toString(36).substring(2,7);
+	}
 
 }
 
