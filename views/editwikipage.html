@@ -1,13 +1,14 @@
 {% extends "layout.html" %}
 
 {% block content %}
+<form method="POST" action="/wiki/{{page.urlTitle}}/update">
   <h3>{{ page.title }} <small> (<a href="PLACEHOLDER_URL_TITLE/similar">Similar</a>)</small></h3>
   <h4>by <a href="{{page.author.route}}">{{ page.author.name }}</a></h4>
-  <div>{{page.tags}}</div>
+  <div><input name='tags' value='{{page.tags}}' type='text' /> </div>
   <hr/>
   <div><a href="{{page.author.route}}">{{page.author.name}}</a></div>
   <div class="page-body">{{ page.content }}</div>
   <hr/>
-  <a href="{{page.route}}/edit" class="btn btn-primary">edit this page</a>
-  <a href="PLACEHOLDER_URL_TITLE/delete" class="btn btn-danger">delete this page</a>
+    <button type="submit" class="btn btn-primary">submit</button>
+</form>
 {% endblock %}

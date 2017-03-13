@@ -3,7 +3,12 @@ var router = express.Router();
 var models = require('../models');
 var Page = models.Page;
 var User = models.User;
+var Promise = require('bluebird');
 
+
+router.get('/wiki', function(req, res, next) {
+	res.redirect('/');
+});
 
 router.get('/', function(req, res, next) {
 	Page.findAll()
@@ -20,7 +25,6 @@ router.post('/', function(req, res, next) {
 			email: req.body.author_email
 		}})
 	.then(function(values){
-		console.log(values);
 		var user = values[0];
 
 		var page = Page.build({
@@ -38,7 +42,7 @@ router.post('/', function(req, res, next) {
 	.catch(next);
 });
 
-router.get('/add', function(req, res, next) {
+router.get('/wiki/add', function(req, res, next) {
 	res.render('addpage');
 });
 
@@ -51,24 +55,87 @@ router.get('/users', function(req, res, next){
 });
 
 router.get('/users/:id', function(req, res, next){
-	User.findById(req.params.id).
-	then(function(user){
-		console.log("Reached!");
-		res.render('userpage', {user: user});
-	})
+	var findId = User.findById(req.params.id);
+	var pagePromise = Page.findAll({
+		where: {
+			authorId: req.params.id
+		}
+	});
+Promise.all([findId, pagePromise]).then(function(values){
+	var user = values[0];
+	var pages = values[1];
+	res.render('userpage', {user: user, pages: pages});
+}).catch(next);
 });
 
+router.get('/wiki/search', function (req, res, next){
+	var allTags = req.body.tags
+	console.log(req.body)
+	Page.findAll({
+		where: {
+			tags: {
+				$overlap: allTags
+			}
+		}
+	})
+	res.render('index')
+});
 
-router.get('/:urlTitle', function (req, res, next){
+router.get('/search', function (req, res, next){
+	res.render('wikisearch');
+})
+
+
+router.get('/wiki/:urlTitle', function (req, res, next){
 	Page.findOne({
 		where: {
 			urlTitle: req.params.urlTitle
-		}
+		},
+		include: [
+			{model:User, as: 'author'}
+		]
 	})
 	.then(function(foundPage){
+		if (foundPage === null) {
+			res.status(404).send("Page does not exist");
+		} else{
 		res.render('wikipage', { page: foundPage });
+		}
 	})
 	.catch(next);
 });
+
+router.post('/wiki/:urlTitle/update', function (req, res, next){
+	Page.update({
+		tags: req.body.tags
+	}, {where: {
+		urlTitle: req.params.urlTitle
+	}, returning: true
+	}).then(function (value){
+		res.redirect(value[1][0].route);
+	}).catch(function (x){
+	})
+})
+
+router.get('/wiki/:urlTitle/edit', function (req, res, next){
+ Page.findOne({
+		where: {
+			urlTitle: req.params.urlTitle
+		},
+		include: [
+			{model:User, as: 'author'}
+		]
+	})
+	.then(function(foundPage){
+		if (foundPage === null) {
+			res.status(404).send("Page does not exist");
+		} else{
+		res.render('editwikipage', { page: foundPage });
+		}
+	})
+	.catch(next);
+});
+
+
 
 module.exports = router;

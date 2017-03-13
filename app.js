@@ -18,7 +18,7 @@ app.engine('html', nunjucks.render);
 
 app.use(express.static('public'));
 
-app.use('/wiki', wikiRouter);
+app.use('/', wikiRouter);
 app.use(function (req, res, next){
     res.status(404).send('404');
 })

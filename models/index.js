@@ -23,6 +23,9 @@ var Page = db.define('page',
 	},
 	status: {
 		type: Sequelize.ENUM('open', 'closed')
+	},
+	tags: {
+		type: Sequelize.ARRAY(Sequelize.TEXT)
 	}
 },
 {
@@ -49,12 +52,13 @@ var User = db.define('user', {
 },
 {
 	getterMethods: {
-		route: function() { return '/wiki/users/' + this.id; }
+		route: function() { return '/users/' + this.id; }
 	}
 });
 
 Page.hook('beforeValidate', function(page, options) {
 	page.urlTitle = nameToUrl(page.title);
+	page.tags = editTags(page.tags);
 })
 
 Page.belongsTo(User, { as: 'author'});
@@ -67,6 +71,10 @@ function nameToUrl(name){
 		return Math.random().toString(36).substring(2,7);
 	}
 
+}
+
+function editTags(tag){
+	return tag.replace(/\s/g,'').split(',');
 }
 
 

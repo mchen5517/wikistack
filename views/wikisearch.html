@@ -1,0 +1,8 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<form method="GET" action="/wiki/search">
+  <input name="tags" type='text'/>
+    <button type="submit" class="btn btn-primary">search</button>
+</form>
+{% endblock %}
