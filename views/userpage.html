@@ -1,6 +1,11 @@
+{% extends "layout.html" %}
+
 {% block content %}
-  <h3>Users</h3>
   <hr>
-    	Name: {{user.name}}
-    	Email: {{user.email}}
+  <h3>
+    <div>Name: {{user.name}}</div>
+    <div>Email: {{user.email}}</div>
+   </h3>
+   Contributions:
+   
 {% endblock %}
