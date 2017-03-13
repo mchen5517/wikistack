@@ -74,7 +74,10 @@ function nameToUrl(name){
 }
 
 function editTags(tag){
+	if(tag){
 	return tag.replace(/\s/g,'').split(',');
+	}
+	return (tag)
 }
 
 
