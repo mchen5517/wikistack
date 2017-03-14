@@ -25,9 +25,9 @@ router.post('/', function (req, res, next) {
 			email: req.body.author_email
 		}
 	})
-		.then(function (values) {
-			var user = values[0];
-
+		.then(function (values) { //the values will have an array of 2 elements. [1. pagefoundorCreated, 2. createdBoolean]
+			var user = values[0]; //this is where the user is in.
+			// console.log(req.body)
 			var page = Page.build({
 				title: req.body.title,
 				content: req.body.content,
@@ -122,6 +122,7 @@ router.get('/wiki/:urlTitle', function (req, res, next) {
 			if (foundPage === null) {
 				res.status(404).send("Page does not exist");
 			} else {
+				// console.log(foundPage.route);
 				res.render('wikipage', { page: foundPage });
 			}
 		})
